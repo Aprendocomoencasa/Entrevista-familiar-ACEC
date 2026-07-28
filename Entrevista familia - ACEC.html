@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrevista Familiar – Aprendo como en casa</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1D9E75; --green-dark: #0F6E56; --green-light: #E8F7F2;
+    --blue: #185FA5; --blue-light: #E6F1FB;
+    --gray-dark: #2C2C2A; --gray-mid: #5F5E5A; --gray-light: #F4F3EF;
+    --gray-border: #DDDBD4; --white: #FFFFFF;
+    --amber: #854F0B; --amber-light: #FEF7ED; --red: #A32D2D; --red-light: #FCEBEB;
+    --font: 'Georgia', serif; --font-ui: 'Arial', sans-serif;
+  }
+  body { font-family: var(--font-ui); background: var(--gray-light); color: var(--gray-dark); min-height: 100vh; }
+  .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--gray-border); z-index: 200; }
+  .progress-bar-fill { height: 100%; background: var(--green); transition: width 0.4s ease; width: 0%; }
+  .site-header { background: var(--green); padding: 14px 24px; display: flex; align-items: center; gap: 12px; position: sticky; top: 4px; z-index: 100; box-shadow: 0 1px 6px rgba(0,0,0,0.12); }
+  .site-header .logo-text { color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.03em; }
+  .site-header .doc-title { color: rgba(255,255,255,0.75); font-size: 12px; margin-left: auto; }
+  .hero { background: var(--green-dark); padding: 40px 24px 36px; text-align: center; border-bottom: 3px solid var(--green); }
+  .hero h1 { font-family: var(--font); font-size: 26px; color: #fff; font-weight: 400; margin-bottom: 8px; }
+  .hero p { color: rgba(255,255,255,0.75); font-size: 13px; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+  .hero .badge { display: inline-block; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.9); font-size: 11px; padding: 4px 12px; border-radius: 20px; margin-top: 14px; letter-spacing: 0.04em; }
+  .main { max-width: 720px; margin: 0 auto; padding: 32px 16px 60px; }
+  .notice { background: var(--blue-light); border-left: 3px solid var(--blue); border-radius: 4px; padding: 12px 16px; margin-bottom: 28px; font-size: 12px; color: var(--blue); line-height: 1.6; }
+  .form-section { background: var(--white); border-radius: 8px; border: 1px solid var(--gray-border); margin-bottom: 20px; overflow: hidden; }
+  .form-section.hidden { display: none; }
+  .section-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid transparent; transition: background 0.15s; user-select: none; }
+  .section-header:hover { background: var(--gray-light); }
+  .section-header.open { border-bottom-color: var(--gray-border); }
+  .sec-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; color: #fff; }
+  .sec-label { flex: 1; }
+  .sec-label strong { font-size: 13px; font-weight: 700; color: var(--gray-dark); display: block; }
+  .sec-label span { font-size: 11px; color: var(--gray-mid); }
+  .sec-chevron { font-size: 14px; color: var(--gray-mid); transition: transform 0.2s; }
+  .section-header.open .sec-chevron { transform: rotate(180deg); }
+  .sec-complete { display: none; font-size: 11px; color: var(--green); font-weight: 700; margin-right: 4px; }
+  .section-body { padding: 20px; display: none; }
+  .section-body.open { display: block; }
+  .field-group { margin-bottom: 18px; }
+  .field-group:last-child { margin-bottom: 0; }
+  .field-row { display: grid; gap: 14px; }
+  .field-row.g2 { grid-template-columns: 1fr 1fr; }
+  .field-row.g3 { grid-template-columns: 1fr 1fr 1fr; }
+  label.field-label { display: block; font-size: 11px; font-weight: 700; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+  .field-hint { font-size: 11px; color: #999; margin-bottom: 5px; line-height: 1.4; }
+  .req { color: var(--red); }
+  input[type="text"], input[type="date"], input[type="time"], textarea, select { width: 100%; border: 1px solid var(--gray-border); border-radius: 5px; padding: 9px 12px; font-size: 13px; font-family: var(--font-ui); color: var(--gray-dark); background: #FAFAF8; outline: none; transition: border-color 0.15s, box-shadow 0.15s; resize: vertical; }
+  input:focus, textarea:focus, select:focus { border-color: var(--green); background: #fff; box-shadow: 0 0 0 3px rgba(29,158,117,0.1); }
+  textarea { min-height: 72px; }
+  select { cursor: pointer; }
+  .other-text { margin-top: 8px; }
+  .options-list { display: flex; flex-direction: column; gap: 6px; }
+  .opt-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px; border-radius: 5px; border: 1px solid var(--gray-border); cursor: pointer; transition: border-color 0.15s, background 0.15s; font-size: 13px; background: #FAFAF8; }
+  .opt-item:hover { border-color: var(--green); background: var(--green-light); }
+  .opt-item input[type="radio"], .opt-item input[type="checkbox"] { width: auto; margin-top: 1px; flex-shrink: 0; accent-color: var(--green); }
+  .opt-text { line-height: 1.4; }
+  .subblock { border: 1px solid var(--gray-border); border-radius: 6px; padding: 14px; background: #FBFBF9; margin-top: 6px; }
+  .subblock-title { font-size: 12px; font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .data-table-wrap { overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 520px; }
+  .data-table th { background: var(--blue-light); color: var(--blue); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 10px; text-align: left; border: 1px solid var(--gray-border); }
+  .data-table td { padding: 3px 3px; border: 1px solid #eee; vertical-align: top; }
+  .data-table td input { border: none; background: transparent; width: 100%; font-size: 12px; padding: 5px 7px; outline: none; font-family: var(--font-ui); }
+  .data-table td input:focus { background: var(--green-light); border-radius: 3px; box-shadow: none; }
+  .add-row-btn { background: none; border: 1.5px dashed var(--gray-border); border-radius: 5px; color: var(--gray-mid); font-size: 12px; padding: 6px 14px; cursor: pointer; margin-top: 8px; width: 100%; font-family: var(--font-ui); }
+  .add-row-btn:hover { border-color: var(--green); color: var(--green); }
+  .field-divider { border: none; border-top: 1px solid var(--gray-border); margin: 18px 0; }
+  .nav-row { display: flex; gap: 10px; margin-top: 18px; }
+  .btn { padding: 9px 20px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1.5px solid; font-family: var(--font-ui); transition: all 0.15s; }
+  .btn-next { background: var(--green); color: #fff; border-color: var(--green); }
+  .btn-next:hover { background: var(--green-dark); }
+  .btn-back { background: #fff; color: var(--gray-mid); border-color: var(--gray-border); }
+  .btn-back:hover { background: var(--gray-light); }
+  .summary-card { background: var(--white); border-radius: 8px; border: 1px solid var(--gray-border); margin-bottom: 16px; overflow: hidden; }
+  .sum-hd { padding: 10px 16px; font-size: 12px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sum-body { padding: 14px 16px; }
+  .sum-row { display: flex; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+  .sum-row:last-child { margin-bottom: 0; }
+  .sum-label { font-weight: 700; color: var(--gray-mid); min-width: 170px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; padding-top: 1px; }
+  .sum-val { color: var(--gray-dark); line-height: 1.5; flex: 1; }
+  .sum-val.empty { color: #bbb; font-style: italic; }
+  .btn-export { background: var(--green); color: #fff; border: none; padding: 11px 24px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font-ui); }
+  .btn-print-sum { background: #fff; color: var(--gray-mid); border: 1.5px solid var(--gray-border); padding: 11px 20px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font-ui); }
+  .export-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .steps-wrap { display: flex; gap: 0; margin-bottom: 28px; overflow-x: auto; }
+  .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 56px; }
+  .step-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--gray-border); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--gray-mid); transition: all 0.2s; z-index: 1; }
+  .step-dot.active { border-color: var(--green); background: var(--green); color: #fff; }
+  .step-dot.done { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .step-line { height: 2px; background: var(--gray-border); flex: 1; margin-top: -14px; }
+  .step-label { font-size: 9px; color: var(--gray-mid); margin-top: 4px; text-align: center; max-width: 60px; }
+  @media (max-width: 600px) { .field-row.g2, .field-row.g3 { grid-template-columns: 1fr; } .sum-row { flex-direction: column; gap: 2px; } .sum-label { min-width: unset; } }
+  @media print { .site-header, .progress-bar-wrap, .notice, .nav-row, .export-row, .steps-wrap, .hero, .add-row-btn { display: none !important; } body { background: #fff; } .main { padding: 0; max-width: 100%; } .form-section { display: none; } #summary-section { display: block !important; } }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill"></div></div>
+
+<header class="site-header">
+  <span class="logo-text">Aprendo como en casa</span>
+  <span class="doc-title">Entrevista Familiar · Conoce a tu paciente</span>
+</header>
+
+<div class="hero">
+  <h1>Entrevista Familiar</h1>
+  <p>Este formulario nos permite conocer mejor a su hijo/a para brindarle el apoyo más adecuado dentro del centro. Sus respuestas son confidenciales y serán usadas únicamente por el equipo terapéutico.</p>
+  <span class="badge">Proyecto «Conoce a tu paciente»</span>
+</div>
+
+<div class="main">
+
+  <div class="notice">
+    <strong>Cómo llenarlo:</strong> La mayoría de las preguntas se responden marcando opciones. Marque todas las que apliquen y use "Otro (especifique)" solo si necesita añadir algo. Si una pregunta no aplica, puede dejarla en blanco. Al finalizar, presione <strong>"Ver resumen"</strong> para revisar y enviar.
+  </div>
+
+  <div id="steps-wrap" class="steps-wrap"></div>
+
+  <!-- S1: Datos generales -->
+  <div class="form-section" id="sec-1">
+    <div class="section-header open" onclick="toggleSection(1)">
+      <div class="sec-num" style="background:#5F5E5A">1</div>
+      <div class="sec-label"><strong>Datos Generales</strong><span>Información básica del paciente</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body open" id="body-1">
+      <div class="field-group">
+        <div class="field-row g2">
+          <div><label class="field-label">Nombre completo del paciente <span class="req">*</span></label><input type="text" id="f-nombre" placeholder="Nombre y apellidos"></div>
+          <div><label class="field-label">Fecha de nacimiento <span class="req">*</span></label><input type="date" id="f-nacimiento"></div>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-row g3">
+          <div><label class="field-label">Sexo <span class="req">*</span></label>
+            <select id="f-sexo"><option value="">Seleccionar</option><option>Femenino</option><option>Masculino</option><option>Otro</option></select>
+          </div>
+          <div><label class="field-label">Fecha de ingreso al centro</label><input type="date" id="f-ingreso"></div>
+          <div><label class="field-label">Nivel de apoyo (si lo conoce)</label>
+            <select id="f-nivel-apoyo"><option value="">No lo sé</option><option>Nivel 1</option><option>Nivel 2</option><option>Nivel 3</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Relación del informante con el paciente <span class="req">*</span></label>
+        <select id="f-relacion" onchange="toggleOther(this,'f-relacion-other')">
+          <option value="">Seleccionar</option><option>Madre</option><option>Padre</option><option>Tutor o tutora</option><option>Abuelo o abuela</option><option>Otro</option>
+        </select>
+        <input type="text" id="f-relacion-other" class="other-text" style="display:none" placeholder="Especifique la relación">
+      </div>
+      <div class="nav-row"><button class="btn btn-next" onclick="goTo(2)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S2: Identificación clínica -->
+  <div class="form-section hidden" id="sec-2">
+    <div class="section-header" onclick="toggleSection(2)">
+      <div class="sec-num" style="background:#185FA5">2</div>
+      <div class="sec-label"><strong>Identificación Clínica</strong><span>Diagnóstico y características</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-2">
+      <div class="field-group"><div class="field-row g2">
+        <div><label class="field-label">Diagnóstico principal</label><input type="text" id="f-dx-principal" placeholder="Ej: Trastorno del Espectro Autista nivel 2"></div>
+        <div><label class="field-label">Diagnóstico secundario o comorbilidades</label><input type="text" id="f-dx-secundario" placeholder="Ej: TDAH"></div>
+      </div></div>
+      <div class="field-group">
+        <label class="field-label">¿Quién realizó el diagnóstico y cuándo?</label>
+        <input type="text" id="f-dx-quien" placeholder="Ej: Dra. López – Psiquiatra, enero 2024">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Rasgos y características particulares que usted observa</label>
+        <p class="field-hint">Comportamientos o patrones que considere importantes que el equipo conozca.</p>
+        <textarea id="f-rasgos" placeholder="Ej: busca rutinas muy específicas, alta tolerancia al dolor, ecolalia..."></textarea>
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(1)">← Anterior</button><button class="btn btn-next" onclick="goTo(3)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S3: Núcleo familiar -->
+  <div class="form-section hidden" id="sec-3">
+    <div class="section-header" onclick="toggleSection(3)">
+      <div class="sec-num" style="background:#0F6E56">3</div>
+      <div class="sec-label"><strong>Núcleo Familiar</strong><span>Con quién vive y dinámica del hogar</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-3">
+      <div class="field-group">
+        <label class="field-label">¿Con quiénes vive el paciente en el hogar?</label>
+        <div class="options-list" id="f-vive-list">
+          <label class="opt-item"><input type="checkbox" value="Madre"> <span class="opt-text">Madre</span></label>
+          <label class="opt-item"><input type="checkbox" value="Padre"> <span class="opt-text">Padre</span></label>
+          <label class="opt-item"><input type="checkbox" value="Hermanos/as"> <span class="opt-text">Hermanos/as</span></label>
+          <label class="opt-item"><input type="checkbox" value="Abuelos/as"> <span class="opt-text">Abuelos/as</span></label>
+          <label class="opt-item"><input type="checkbox" value="Tíos/as"> <span class="opt-text">Tíos/as u otros familiares</span></label>
+          <label class="opt-item"><input type="checkbox" value="Cuidador/a externo/a"> <span class="opt-text">Cuidador/a externo/a (nana)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-vive-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-vive-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group"><div class="field-row g2">
+        <div><label class="field-label">Cuidador/a principal</label><input type="text" id="f-cuidador" placeholder="Ej: madre, abuela materna"></div>
+        <div><label class="field-label">Otros cuidadores o personas de apoyo</label><input type="text" id="f-otros-cuidadores" placeholder="Ej: nana de lunes a viernes"></div>
+      </div></div>
+      <div class="field-group">
+        <label class="field-label">Dinámica familiar relevante</label>
+        <div class="options-list" id="f-dinamica-list">
+          <label class="opt-item"><input type="checkbox" value="Padres casados"> <span class="opt-text">Padres casados</span></label>
+          <label class="opt-item"><input type="checkbox" value="Padres separados"> <span class="opt-text">Padres separados</span></label>
+          <label class="opt-item"><input type="checkbox" value="Custodia compartida"> <span class="opt-text">Custodia compartida</span></label>
+          <label class="opt-item"><input type="checkbox" value="Familia monoparental"> <span class="opt-text">Familia monoparental (un solo cuidador)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Vive con familia extendida"> <span class="opt-text">Vive con familia extendida</span></label>
+          <label class="opt-item"><input type="checkbox" value="Hermano/a con necesidades similares"> <span class="opt-text">Hay hermano/a con necesidades similares</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-dinamica-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-dinamica-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Algo de la dinámica familiar que el equipo deba saber? <span style="color:#999;font-weight:400;text-transform:none">(opcional)</span></label>
+        <textarea id="f-dinamica-notas" placeholder="Cualquier detalle que ayude al equipo a apoyar mejor a su hijo/a."></textarea>
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(2)">← Anterior</button><button class="btn btn-next" onclick="goTo(4)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S4: Desarrollo, independencia y sueño -->
+  <div class="form-section hidden" id="sec-4">
+    <div class="section-header" onclick="toggleSection(4)">
+      <div class="sec-num" style="background:#854F0B">4</div>
+      <div class="sec-label"><strong>Desarrollo, Independencia y Sueño</strong><span>Autonomía diaria y descanso</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-4">
+      <div class="field-group"><div class="field-row g2">
+        <div><label class="field-label">Edad cronológica</label><input type="text" id="f-edad-cronologica" placeholder="Ej: 8 años"></div>
+        <div><label class="field-label">Edad de desarrollo aproximada (si la sabe)</label><input type="text" id="f-edad-desarrollo" placeholder="Ej: equivalente a 5 años"></div>
+      </div></div>
+      <div class="field-group">
+        <label class="field-label">Nivel de independencia en actividades diarias</label>
+        <div class="options-list" id="f-independencia-list">
+          <label class="opt-item"><input type="checkbox" value="Alimentación autónoma"> <span class="opt-text">Alimentación autónoma (come solo/a)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Necesita apoyo en alimentación"> <span class="opt-text">Necesita apoyo en alimentación</span></label>
+          <label class="opt-item"><input type="checkbox" value="Higiene personal autónoma"> <span class="opt-text">Higiene personal autónoma</span></label>
+          <label class="opt-item"><input type="checkbox" value="Necesita apoyo en higiene"> <span class="opt-text">Necesita apoyo en higiene personal</span></label>
+          <label class="opt-item"><input type="checkbox" value="Se viste solo/a"> <span class="opt-text">Se viste solo/a</span></label>
+          <label class="opt-item"><input type="checkbox" value="Necesita apoyo para vestirse"> <span class="opt-text">Necesita apoyo para vestirse</span></label>
+          <label class="opt-item"><input type="checkbox" value="Control de esfínteres logrado"> <span class="opt-text">Control de esfínteres logrado</span></label>
+          <label class="opt-item"><input type="checkbox" value="Control de esfínteres en proceso"> <span class="opt-text">Control de esfínteres en proceso</span></label>
+          <label class="opt-item"><input type="checkbox" value="Se desplaza de forma autónoma"> <span class="opt-text">Se desplaza de forma autónoma</span></label>
+          <label class="opt-item"><input type="checkbox" value="Necesita apoyo en transiciones"> <span class="opt-text">Necesita apoyo en transiciones y desplazamientos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-independencia-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-independencia-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Consideraciones sobre desarrollo y etapa actual <span style="color:#999;font-weight:400;text-transform:none">(opcional)</span></label>
+        <p class="field-hint">Si está en pubertad o adolescencia, o si observa conductas relacionadas con el desarrollo, indíquelo aquí.</p>
+        <textarea id="f-desarrollo-notas" placeholder=""></textarea>
+      </div>
+
+      <div class="subblock">
+        <div class="subblock-title">🌙 Sueño y descanso</div>
+        <div class="field-group">
+          <label class="field-label">¿Cómo es el sueño de su hijo/a habitualmente?</label>
+          <div class="options-list" id="f-sueno-list">
+            <label class="opt-item"><input type="checkbox" value="Duerme bien y de corrido"> <span class="opt-text">Duerme bien y de corrido</span></label>
+            <label class="opt-item"><input type="checkbox" value="Le cuesta quedarse dormido/a"> <span class="opt-text">Le cuesta quedarse dormido/a</span></label>
+            <label class="opt-item"><input type="checkbox" value="Se despierta durante la noche"> <span class="opt-text">Se despierta durante la noche</span></label>
+            <label class="opt-item"><input type="checkbox" value="Se despierta muy temprano"> <span class="opt-text">Se despierta muy temprano</span></label>
+            <label class="opt-item"><input type="checkbox" value="Duerme pocas horas"> <span class="opt-text">Duerme pocas horas</span></label>
+            <label class="opt-item"><input type="checkbox" value="Horarios irregulares"> <span class="opt-text">Horarios de sueño irregulares</span></label>
+            <label class="opt-item"><input type="checkbox" value="Necesita compañía para dormir"> <span class="opt-text">Necesita compañía para dormir</span></label>
+            <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-sueno-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+          </div>
+          <input type="text" id="f-sueno-list-other" class="other-text" style="display:none" placeholder="Especifique">
+        </div>
+        <div class="field-group"><div class="field-row g2">
+          <div><label class="field-label">Horario habitual de sueño</label><input type="text" id="f-sueno-horario" placeholder="Ej: se acuesta 9pm, se levanta 6am"></div>
+          <div><label class="field-label">Rutina antes de dormir</label><input type="text" id="f-sueno-rutina" placeholder="Ej: baño, cuento, luz tenue, sin pantallas"></div>
+        </div></div>
+        <div class="field-group">
+          <label class="field-label">¿Usa algo para ayudarse a dormir?</label>
+          <p class="field-hint">Si es un medicamento, indíquelo también en la sección de Medicación.</p>
+          <input type="text" id="f-sueno-apoyo" placeholder="Ej: melatonina, objeto de apego, ruido de fondo, luz encendida...">
+        </div>
+        <div class="field-group">
+          <label class="field-label">¿Nota diferencia en su comportamiento según cómo durmió? <span style="color:#999;font-weight:400;text-transform:none">(opcional)</span></label>
+          <textarea id="f-sueno-impacto" placeholder="Ej: si duerme mal, al otro día está más irritable y le cuesta concentrarse..."></textarea>
+        </div>
+      </div>
+
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(3)">← Anterior</button><button class="btn btn-next" onclick="goTo(5)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S5: Medicación -->
+  <div class="form-section hidden" id="sec-5">
+    <div class="section-header" onclick="toggleSection(5)">
+      <div class="sec-num" style="background:#993556">5</div>
+      <div class="sec-label"><strong>Medicación</strong><span>Medicamentos que toma actualmente</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-5">
+      <div class="field-group">
+        <label class="field-label">¿Su hijo/a toma algún medicamento actualmente?</label>
+        <div class="options-list">
+          <label class="opt-item"><input type="radio" name="f-med" value="Sí" onclick="showMedTable(true)"> <span class="opt-text">Sí</span></label>
+          <label class="opt-item"><input type="radio" name="f-med" value="No actualmente" onclick="showMedTable(false)"> <span class="opt-text">No actualmente</span></label>
+        </div>
+      </div>
+      <div id="f-med-detail" style="display:none">
+        <div class="field-group">
+          <p class="field-hint">Complete una fila por cada medicamento.</p>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead><tr><th style="width:26%">Medicamento / dosis</th><th style="width:18%">Horario</th><th style="width:28%">Para qué sirve</th><th style="width:28%">Efectos que observa</th></tr></thead>
+              <tbody id="f-med-tbody">
+                <tr><td><input placeholder="Ej: Risperidona 0.5mg"></td><td><input placeholder="Mañana"></td><td><input placeholder="Regula el ánimo"></td><td><input placeholder="Le da sueño"></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="add-row-btn" onclick="addMedRow()">+ Agregar medicamento</button>
+        </div>
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(4)">← Anterior</button><button class="btn btn-next" onclick="goTo(6)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S6: Comunicación -->
+  <div class="form-section hidden" id="sec-6">
+    <div class="section-header" onclick="toggleSection(6)">
+      <div class="sec-num" style="background:#3B6D11">6</div>
+      <div class="sec-label"><strong>Comunicación</strong><span>Cómo comprende y se expresa</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-6">
+      <div class="field-group">
+        <label class="field-label">¿Cómo comprende mejor las instrucciones?</label>
+        <div class="options-list" id="f-comprende-list">
+          <label class="opt-item"><input type="checkbox" value="Instrucciones verbales simples (1-2 pasos)"> <span class="opt-text">Instrucciones verbales simples (1-2 pasos)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Apoyo visual (pictogramas, imágenes)"> <span class="opt-text">Apoyo visual (pictogramas, imágenes)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Demostración física (modelado)"> <span class="opt-text">Demostración física (modelado)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Instrucciones escritas"> <span class="opt-text">Instrucciones escritas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Combinación de verbal y visual"> <span class="opt-text">Combinación de verbal y visual</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-comprende-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-comprende-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Cómo se expresa su hijo/a principalmente?</label>
+        <div class="options-list" id="f-expresa-list">
+          <label class="opt-item"><input type="checkbox" value="Lenguaje verbal funcional"> <span class="opt-text">Lenguaje verbal funcional</span></label>
+          <label class="opt-item"><input type="checkbox" value="Ecolalia (repite frases o palabras)"> <span class="opt-text">Ecolalia (repite frases o palabras)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Señala o gesticula"> <span class="opt-text">Señala o gesticula</span></label>
+          <label class="opt-item"><input type="checkbox" value="Sistema PECS u otro alternativo"> <span class="opt-text">Sistema PECS u otro sistema alternativo</span></label>
+          <label class="opt-item"><input type="checkbox" value="Comunicación no verbal"> <span class="opt-text">Comunicación no verbal</span></label>
+          <label class="opt-item"><input type="checkbox" value="Dispositivo o tablero de comunicación"> <span class="opt-text">Dispositivo o tablero de comunicación</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-expresa-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-expresa-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Apoyos de comunicación que utiliza actualmente</label>
+        <div class="options-list" id="f-apoyos-list">
+          <label class="opt-item"><input type="checkbox" value="Tablero de comunicación"> <span class="opt-text">Tablero de comunicación</span></label>
+          <label class="opt-item"><input type="checkbox" value="Pictogramas"> <span class="opt-text">Pictogramas</span></label>
+          <label class="opt-item"><input type="checkbox" value="App o dispositivo"> <span class="opt-text">App o dispositivo (iPad, tablet)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Lengua de señas"> <span class="opt-text">Lengua de señas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Ninguno"> <span class="opt-text">Ninguno por ahora</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-apoyos-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-apoyos-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Algo más sobre la comunicación de su hijo/a? <span style="color:#999;font-weight:400;text-transform:none">(opcional)</span></label>
+        <textarea id="f-com-notas" placeholder=""></textarea>
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(5)">← Anterior</button><button class="btn btn-next" onclick="goTo(7)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S7: Procesamiento sensorial -->
+  <div class="form-section hidden" id="sec-7">
+    <div class="section-header" onclick="toggleSection(7)">
+      <div class="sec-num" style="background:#0E7C86">7</div>
+      <div class="sec-label"><strong>Procesamiento Sensorial</strong><span>Sensibilidades y búsqueda sensorial</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-7">
+      <div class="field-group">
+        <label class="field-label">Hipersensibilidades — cosas que le molestan o sobreestimulan</label>
+        <div class="options-list" id="f-hiper-list">
+          <label class="opt-item"><input type="checkbox" value="Sonidos fuertes o inesperados"> <span class="opt-text">Sonidos fuertes o inesperados</span></label>
+          <label class="opt-item"><input type="checkbox" value="Contacto físico no deseado"> <span class="opt-text">Contacto físico no deseado</span></label>
+          <label class="opt-item"><input type="checkbox" value="Texturas en ropa o alimentos"> <span class="opt-text">Texturas específicas en ropa o alimentos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Olores fuertes"> <span class="opt-text">Olores fuertes</span></label>
+          <label class="opt-item"><input type="checkbox" value="Luz brillante o parpadeante"> <span class="opt-text">Luz brillante o parpadeante</span></label>
+          <label class="opt-item"><input type="checkbox" value="Ambientes con mucha gente o ruido"> <span class="opt-text">Ambientes con mucha gente o ruido</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-hiper-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-hiper-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Búsqueda sensorial — cosas que busca activamente</label>
+        <div class="options-list" id="f-busca-list">
+          <label class="opt-item"><input type="checkbox" value="Presión profunda (abrazos, objetos pesados)"> <span class="opt-text">Presión profunda (abrazos fuertes, objetos pesados)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Movimiento constante (saltar, girar, mecerse)"> <span class="opt-text">Movimiento constante (saltar, girar, mecerse)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Estímulos visuales (luces, colores)"> <span class="opt-text">Estímulos visuales (luces, colores)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Estímulos táctiles (tocar superficies, objetos)"> <span class="opt-text">Estímulos táctiles (tocar superficies, objetos)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Sonidos o música específicos"> <span class="opt-text">Sonidos o música específicos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-busca-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-busca-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(6)">← Anterior</button><button class="btn btn-next" onclick="goTo(8)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S8: Regulación conductual y emocional -->
+  <div class="form-section hidden" id="sec-8">
+    <div class="section-header" onclick="toggleSection(8)">
+      <div class="sec-num" style="background:#534AB7">8</div>
+      <div class="sec-label"><strong>Regulación Conductual y Emocional</strong><span>Señales, detonantes y qué ayuda</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-8">
+      <div class="field-group">
+        <label class="field-label">Señales de estrés o inicio de crisis que usted reconoce</label>
+        <div class="options-list" id="f-senales-list">
+          <label class="opt-item"><input type="checkbox" value="Se tapa los oídos"> <span class="opt-text">Se tapa los oídos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Aumentan movimientos repetitivos"> <span class="opt-text">Aumentan movimientos repetitivos o estereotipias</span></label>
+          <label class="opt-item"><input type="checkbox" value="Aumenta la ecolalia"> <span class="opt-text">Aumenta la ecolalia</span></label>
+          <label class="opt-item"><input type="checkbox" value="Se aísla o se aleja"> <span class="opt-text">Se aísla o se aleja</span></label>
+          <label class="opt-item"><input type="checkbox" value="Llora o grita"> <span class="opt-text">Llora o grita</span></label>
+          <label class="opt-item"><input type="checkbox" value="Se pone rígido/a o tenso/a"> <span class="opt-text">Se pone rígido/a o tenso/a</span></label>
+          <label class="opt-item"><input type="checkbox" value="Agitación o inquietud"> <span class="opt-text">Agitación o inquietud</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-senales-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-senales-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Detonantes frecuentes — ¿qué lo desregula?</label>
+        <div class="options-list" id="f-triggers-list">
+          <label class="opt-item"><input type="checkbox" value="Cambios imprevistos en la rutina"> <span class="opt-text">Cambios imprevistos en la rutina</span></label>
+          <label class="opt-item"><input type="checkbox" value="Ruido inesperado o intenso"> <span class="opt-text">Ruido inesperado o intenso</span></label>
+          <label class="opt-item"><input type="checkbox" value="Demandas directas o exigencia de tareas"> <span class="opt-text">Demandas directas o exigencia de tareas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Transiciones entre actividades"> <span class="opt-text">Transiciones entre actividades</span></label>
+          <label class="opt-item"><input type="checkbox" value="Esperas prolongadas"> <span class="opt-text">Esperas prolongadas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Interacción social no deseada"> <span class="opt-text">Interacción social no deseada</span></label>
+          <label class="opt-item"><input type="checkbox" value="Negativa a sus solicitudes"> <span class="opt-text">Negativa a sus solicitudes</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-triggers-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-triggers-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Qué ayuda a regularlo/a cuando está desregulado/a?</label>
+        <div class="options-list" id="f-regula-list">
+          <label class="opt-item"><input type="checkbox" value="Espacio tranquilo"> <span class="opt-text">Un espacio tranquilo</span></label>
+          <label class="opt-item"><input type="checkbox" value="Presión profunda (abrazos, peso)"> <span class="opt-text">Presión profunda (abrazos, peso)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Objeto de apego"> <span class="opt-text">Un objeto de apego</span></label>
+          <label class="opt-item"><input type="checkbox" value="Música o sonidos específicos"> <span class="opt-text">Música o sonidos específicos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Anticipar con pictogramas"> <span class="opt-text">Anticipar lo que sigue (pictogramas)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Actividad favorita"> <span class="opt-text">Su actividad favorita</span></label>
+          <label class="opt-item"><input type="checkbox" value="Alejarse de la situación"> <span class="opt-text">Alejarse de la situación</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-regula-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-regula-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Conductas típicas que observa frecuentemente</label>
+        <div class="options-list" id="f-conductas-list">
+          <label class="opt-item"><input type="checkbox" value="Rigidez ante los cambios"> <span class="opt-text">Rigidez ante los cambios</span></label>
+          <label class="opt-item"><input type="checkbox" value="Evitación de demandas o tareas"> <span class="opt-text">Evitación de demandas o tareas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Movimientos repetitivos"> <span class="opt-text">Movimientos repetitivos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Búsqueda de rutinas fijas"> <span class="opt-text">Búsqueda de rutinas fijas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Dificultad para transiciones"> <span class="opt-text">Dificultad para las transiciones</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-conductas-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-conductas-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(7)">← Anterior</button><button class="btn btn-next" onclick="goTo(9)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S9: Motivadores y aprendizaje -->
+  <div class="form-section hidden" id="sec-9">
+    <div class="section-header" onclick="toggleSection(9)">
+      <div class="sec-num" style="background:#B06A00">9</div>
+      <div class="sec-label"><strong>Motivadores y Aprendizaje</strong><span>Intereses y recompensas</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-9">
+      <div class="field-group">
+        <label class="field-label">Intereses especiales o temas favoritos</label>
+        <p class="field-hint">¿De qué cosas no puede dejar de hablar o a qué siempre quiere volver? Escríbalo con sus palabras.</p>
+        <textarea id="f-intereses" placeholder="Ej: los trenes, un personaje específico, girar tapas, una canción..."></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Qué lo motiva o funciona como recompensa?</label>
+        <div class="options-list" id="f-reforzadores-list">
+          <label class="opt-item"><input type="checkbox" value="Tiempo en dispositivos (iPad, tablet, TV)"> <span class="opt-text">Tiempo en dispositivos (iPad, tablet, TV)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Elogios verbales y reconocimiento"> <span class="opt-text">Elogios verbales y reconocimiento</span></label>
+          <label class="opt-item"><input type="checkbox" value="Actividad favorita como recompensa"> <span class="opt-text">Actividad favorita como recompensa</span></label>
+          <label class="opt-item"><input type="checkbox" value="Tiempo libre o juego libre"> <span class="opt-text">Tiempo libre o juego libre</span></label>
+          <label class="opt-item"><input type="checkbox" value="Alimentos o bebidas preferidas"> <span class="opt-text">Alimentos o bebidas preferidas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Objetos sensoriales (juguetes, peluches)"> <span class="opt-text">Objetos sensoriales (juguetes, peluches)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Fichas o sistema de puntos"> <span class="opt-text">Fichas o sistema de puntos</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otro" onchange="toggleOther(this,'f-reforzadores-list-other')"> <span class="opt-text">Otro (especifique)</span></label>
+        </div>
+        <input type="text" id="f-reforzadores-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(8)">← Anterior</button><button class="btn btn-next" onclick="goTo(10)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S10: Profesionales y terapias externas -->
+  <div class="form-section hidden" id="sec-10">
+    <div class="section-header" onclick="toggleSection(10)">
+      <div class="sec-num" style="background:#185FA5">10</div>
+      <div class="sec-label"><strong>Profesionales y Terapias Externas</strong><span>Quién lo atiende fuera del centro</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-10">
+      <div class="field-group">
+        <label class="field-label">Profesionales que atienden a su hijo/a</label>
+        <p class="field-hint">Una fila por profesional.</p>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th style="width:34%">Especialidad</th><th style="width:34%">Nombre</th><th style="width:32%">Cada cuánto lo ve</th></tr></thead>
+            <tbody id="f-prof-tbody">
+              <tr><td><input placeholder="Ej: Pediatra"></td><td><input placeholder="Ej: Dr. Pérez"></td><td><input placeholder="Ej: cada 3 meses"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="add-row-btn" onclick="addProfRow()">+ Agregar profesional</button>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Terapias externas que recibe fuera del centro</label>
+        <p class="field-hint">Una fila por terapia.</p>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th style="width:34%">Tipo de terapia</th><th style="width:34%">Terapeuta</th><th style="width:32%">Horario</th></tr></thead>
+            <tbody id="f-terapias-tbody">
+              <tr><td><input placeholder="Ej: Fonoaudiología"></td><td><input placeholder="Ej: Lic. Peralta"></td><td><input placeholder="Ej: lun y mié 3pm"></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="add-row-btn" onclick="addTerapiaRow()">+ Agregar terapia</button>
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Recomendaciones recientes de algún especialista? <span style="color:#999;font-weight:400;text-transform:none">(opcional)</span></label>
+        <textarea id="f-recomendaciones" placeholder="Ej: el neurólogo recomendó... / la psiquiatra ajustó..."></textarea>
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(9)">← Anterior</button><button class="btn btn-next" onclick="goTo(11)">Continuar →</button></div>
+    </div>
+  </div>
+
+  <!-- S11: Condiciones de salud y seguridad -->
+  <div class="form-section hidden" id="sec-11">
+    <div class="section-header" onclick="toggleSection(11)">
+      <div class="sec-num" style="background:#A32D2D">11</div>
+      <div class="sec-label"><strong>Condiciones de Salud y Seguridad</strong><span>Información importante para el cuidado</span></div>
+      <span class="sec-chevron">▾</span>
+    </div>
+    <div class="section-body" id="body-11">
+      <div class="field-group">
+        <label class="field-label">Condición médica / de salud</label>
+        <div class="options-list" id="f-medica-list">
+          <label class="opt-item"><input type="checkbox" value="Ninguna"> <span class="opt-text">Ninguna</span></label>
+          <label class="opt-item"><input type="checkbox" value="Alergias" onchange="toggleOther(this,'f-medica-alergia')"> <span class="opt-text">Alergias (alimentos / medicamentos)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Asma o problemas respiratorios"> <span class="opt-text">Asma o problemas respiratorios</span></label>
+          <label class="opt-item"><input type="checkbox" value="Problemas digestivos"> <span class="opt-text">Problemas digestivos (reflujo, gastritis, estreñimiento)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Problemas de alimentación o deglución"> <span class="opt-text">Problemas de alimentación o deglución</span></label>
+          <label class="opt-item"><input type="checkbox" value="Condición de la piel"> <span class="opt-text">Condición de la piel</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otra" onchange="toggleOther(this,'f-medica-list-other')"> <span class="opt-text">Otra condición médica (especifique)</span></label>
+        </div>
+        <input type="text" id="f-medica-alergia" class="other-text" style="display:none" placeholder="¿A qué es alérgico/a?">
+        <input type="text" id="f-medica-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Condición neurológica</label>
+        <div class="options-list" id="f-neuro-list">
+          <label class="opt-item"><input type="checkbox" value="Ninguna"> <span class="opt-text">Ninguna</span></label>
+          <label class="opt-item"><input type="checkbox" value="Epilepsia o convulsiones"> <span class="opt-text">Epilepsia o convulsiones</span></label>
+          <label class="opt-item"><input type="checkbox" value="Válvula o derivación cerebral"> <span class="opt-text">Válvula o derivación cerebral</span></label>
+          <label class="opt-item"><input type="checkbox" value="Migrañas frecuentes"> <span class="opt-text">Migrañas frecuentes</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otra" onchange="toggleOther(this,'f-neuro-list-other')"> <span class="opt-text">Otra condición neurológica (especifique)</span></label>
+        </div>
+        <input type="text" id="f-neuro-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Condición motora</label>
+        <div class="options-list" id="f-motora-list">
+          <label class="opt-item"><input type="checkbox" value="Ninguna"> <span class="opt-text">Ninguna</span></label>
+          <label class="opt-item"><input type="checkbox" value="Pie plano"> <span class="opt-text">Pie plano</span></label>
+          <label class="opt-item"><input type="checkbox" value="Hipotonía (bajo tono muscular)"> <span class="opt-text">Hipotonía (bajo tono muscular)</span></label>
+          <label class="opt-item"><input type="checkbox" value="Usa órtesis o férulas"> <span class="opt-text">Usa órtesis o férulas</span></label>
+          <label class="opt-item"><input type="checkbox" value="Dificultad para caminar o desplazarse"> <span class="opt-text">Dificultad para caminar o desplazarse</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otra" onchange="toggleOther(this,'f-motora-list-other')"> <span class="opt-text">Otra condición motora (especifique)</span></label>
+        </div>
+        <input type="text" id="f-motora-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Seguridad / conducta</label>
+        <div class="options-list" id="f-seguridad-list">
+          <label class="opt-item"><input type="checkbox" value="Ninguna"> <span class="opt-text">Ninguna</span></label>
+          <label class="opt-item"><input type="checkbox" value="Tendencia a fugarse o alejarse"> <span class="opt-text">Tendencia a fugarse o alejarse</span></label>
+          <label class="opt-item"><input type="checkbox" value="Baja percepción del peligro"> <span class="opt-text">Baja percepción del peligro</span></label>
+          <label class="opt-item"><input type="checkbox" value="Se lleva objetos a la boca"> <span class="opt-text">Se lleva objetos a la boca</span></label>
+          <label class="opt-item"><input type="checkbox" value="Muerde o aprieta"> <span class="opt-text">Muerde o aprieta</span></label>
+          <label class="opt-item"><input type="checkbox" value="Se autolesiona"> <span class="opt-text">Se autolesiona</span></label>
+          <label class="opt-item"><input type="checkbox" value="Otra" onchange="toggleOther(this,'f-seguridad-list-other')"> <span class="opt-text">Otra (especifique)</span></label>
+        </div>
+        <input type="text" id="f-seguridad-list-other" class="other-text" style="display:none" placeholder="Especifique">
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Hay alguna condición, alergia o situación de salud importante que no aparezca arriba y el equipo deba conocer? <span style="color:#999;font-weight:400;text-transform:none">(opcional)</span></label>
+        <textarea id="f-salud-otros" placeholder=""></textarea>
+      </div>
+      <div class="nav-row"><button class="btn btn-back" onclick="goTo(10)">← Anterior</button><button class="btn btn-next" onclick="goTo(12)">Ver resumen →</button></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="form-section hidden" id="summary-section">
+    <div class="section-header open" style="cursor:default">
+      <div class="sec-num" style="background:#1D9E75">✓</div>
+      <div class="sec-label"><strong>Resumen de la Entrevista</strong><span>Revise la información antes de enviar</span></div>
+    </div>
+    <div class="section-body open" id="summary-body"></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const TOTAL = 11;
+let currentSection = 1;
+const COLORS = {1:'#5F5E5A',2:'#185FA5',3:'#0F6E56',4:'#854F0B',5:'#993556',6:'#3B6D11',7:'#0E7C86',8:'#534AB7',9:'#B06A00',10:'#185FA5',11:'#A32D2D'};
+const LABELS = {1:'Datos',2:'Clínica',3:'Familia',4:'Desarrollo',5:'Medicación',6:'Comunicación',7:'Sensorial',8:'Regulación',9:'Motivadores',10:'Equipo',11:'Salud'};
+
+function buildSteps(){
+  const wrap=document.getElementById('steps-wrap'); wrap.innerHTML='';
+  for(let i=1;i<=TOTAL;i++){
+    const div=document.createElement('div'); div.className='step-item';
+    div.innerHTML=`${i>1?`<div class="step-line${i<=currentSection?' done':''}" style="${i<=currentSection?'background:'+COLORS[i-1]:''}"></div>`:''}
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="step-dot ${i<currentSection?'done':i===currentSection?'active':''}" style="${i===currentSection?'background:'+COLORS[i]+';border-color:'+COLORS[i]:''}${i<currentSection?';border-color:'+COLORS[i]:''}">${i<currentSection?'✓':i}</div>
+        <div class="step-label">${LABELS[i]}</div>
+      </div>`;
+    div.style.flex='1'; wrap.appendChild(div);
+  }
+}
+function updateProgress(){ document.getElementById('progress-fill').style.width=(((currentSection-1)/TOTAL)*100)+'%'; }
+function goTo(n){
+  for(let i=1;i<=TOTAL;i++){ const s=document.getElementById('sec-'+i); if(s) s.classList.add('hidden'); }
+  document.getElementById('summary-section').classList.add('hidden');
+  if(n>TOTAL){ buildSummary(); document.getElementById('summary-section').classList.remove('hidden'); currentSection=TOTAL+1; }
+  else { const t=document.getElementById('sec-'+n); if(t){ t.classList.remove('hidden'); document.getElementById('body-'+n).classList.add('open'); document.querySelector('#sec-'+n+' .section-header').classList.add('open'); } currentSection=n; }
+  buildSteps(); updateProgress(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleSection(n){ document.getElementById('body-'+n).classList.toggle('open'); document.querySelector('#sec-'+n+' .section-header').classList.toggle('open'); }
+function toggleOther(trigger,inputId){
+  const el=document.getElementById(inputId); if(!el) return;
+  const show = (trigger.type==='checkbox') ? trigger.checked : (trigger.value==='Otro');
+  el.style.display=show?'block':'none'; if(!show) el.value='';
+}
+function showMedTable(show){ document.getElementById('f-med-detail').style.display=show?'block':'none'; }
+function addMedRow(){ const t=document.getElementById('f-med-tbody'); const r=document.createElement('tr'); r.innerHTML='<td><input placeholder="Medicamento / dosis"></td><td><input placeholder="Horario"></td><td><input placeholder="Para qué sirve"></td><td><input placeholder="Efectos"></td>'; t.appendChild(r); }
+function addProfRow(){ const t=document.getElementById('f-prof-tbody'); const r=document.createElement('tr'); r.innerHTML='<td><input placeholder="Especialidad"></td><td><input placeholder="Nombre"></td><td><input placeholder="Cada cuánto lo ve"></td>'; t.appendChild(r); }
+function addTerapiaRow(){ const t=document.getElementById('f-terapias-tbody'); const r=document.createElement('tr'); r.innerHTML='<td><input placeholder="Tipo de terapia"></td><td><input placeholder="Terapeuta"></td><td><input placeholder="Horario"></td>'; t.appendChild(r); }
+
+function getChecked(listId){
+  const list=document.getElementById(listId); if(!list) return '';
+  let vals=Array.from(list.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.value);
+  const other=document.getElementById(listId+'-other');
+  if(other && other.value.trim()){ vals=vals.filter(v=>v!=='Otro'&&v!=='Otra'); vals.push('Otro: '+other.value.trim()); }
+  return vals.join(', ');
+}
+function val(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
+function relacion(){ return val('f-relacion')==='Otro' ? (val('f-relacion-other')||'Otro') : val('f-relacion'); }
+function medica(){ let v=getChecked('f-medica-list'); if(val('f-medica-alergia')) v+=(v?' — ':'')+'alergia a: '+val('f-medica-alergia'); return v; }
+function getTable(tbodyId){
+  const rows=document.querySelectorAll('#'+tbodyId+' tr');
+  return Array.from(rows).map(row=>{ const vs=Array.from(row.querySelectorAll('input')).map(i=>i.value.trim()); if(vs.every(v=>!v)) return null; return '• '+vs.filter(Boolean).join(' | '); }).filter(Boolean).join('\n');
+}
+function join(a,b){ return [a,b].filter(x=>x&&x.trim()).join(' · '); }
+function medResumen(){ const r=document.querySelector('input[name="f-med"]:checked'); if(!r) return ''; if(r.value!=='Sí') return r.value; const t=getTable('f-med-tbody'); return 'Sí'+(t?'\n'+t:''); }
+
+function buildSummary(){
+  const body=document.getElementById('summary-body');
+  const sections=[
+    {color:'#5F5E5A',title:'1. Datos Generales',rows:[
+      {l:'Paciente',v:val('f-nombre')},{l:'Fecha de nacimiento',v:val('f-nacimiento')},{l:'Sexo',v:val('f-sexo')},
+      {l:'Fecha de ingreso',v:val('f-ingreso')},{l:'Nivel de apoyo',v:val('f-nivel-apoyo')},{l:'Informante',v:relacion()}]},
+    {color:'#185FA5',title:'2. Identificación Clínica',rows:[
+      {l:'Diagnóstico principal',v:val('f-dx-principal')},{l:'Diagnóstico secundario',v:val('f-dx-secundario')},
+      {l:'Diagnóstico realizado por',v:val('f-dx-quien')},{l:'Rasgos particulares',v:val('f-rasgos')}]},
+    {color:'#0F6E56',title:'3. Núcleo Familiar',rows:[
+      {l:'Vive con',v:getChecked('f-vive-list')},{l:'Cuidador/a principal',v:val('f-cuidador')},{l:'Otros cuidadores',v:val('f-otros-cuidadores')},
+      {l:'Dinámica familiar',v:getChecked('f-dinamica-list')},{l:'Notas de la familia',v:val('f-dinamica-notas')}]},
+    {color:'#854F0B',title:'4. Desarrollo, Independencia y Sueño',rows:[
+      {l:'Edad cronológica',v:val('f-edad-cronologica')},{l:'Edad de desarrollo',v:val('f-edad-desarrollo')},
+      {l:'Independencia',v:getChecked('f-independencia-list')},{l:'Consideraciones de desarrollo',v:val('f-desarrollo-notas')},
+      {l:'Sueño (patrón)',v:getChecked('f-sueno-list')},{l:'Horario de sueño',v:val('f-sueno-horario')},{l:'Rutina para dormir',v:val('f-sueno-rutina')},
+      {l:'Apoyo para dormir',v:val('f-sueno-apoyo')},{l:'Impacto del sueño',v:val('f-sueno-impacto')}]},
+    {color:'#993556',title:'5. Medicación',rows:[{l:'Toma medicamento',v:medResumen()}]},
+    {color:'#3B6D11',title:'6. Comunicación',rows:[
+      {l:'Cómo comprende',v:getChecked('f-comprende-list')},{l:'Cómo se expresa',v:getChecked('f-expresa-list')},
+      {l:'Apoyos de comunicación',v:getChecked('f-apoyos-list')},{l:'Notas de comunicación',v:val('f-com-notas')}]},
+    {color:'#0E7C86',title:'7. Procesamiento Sensorial',rows:[
+      {l:'Hipersensibilidades',v:getChecked('f-hiper-list')},{l:'Búsqueda sensorial',v:getChecked('f-busca-list')}]},
+    {color:'#534AB7',title:'8. Regulación Conductual y Emocional',rows:[
+      {l:'Señales de estrés / crisis',v:getChecked('f-senales-list')},{l:'Detonantes',v:getChecked('f-triggers-list')},
+      {l:'Qué ayuda a regularlo/a',v:getChecked('f-regula-list')},{l:'Conductas típicas',v:getChecked('f-conductas-list')}]},
+    {color:'#B06A00',title:'9. Motivadores y Aprendizaje',rows:[
+      {l:'Intereses especiales',v:val('f-intereses')},{l:'Reforzadores',v:getChecked('f-reforzadores-list')}]},
+    {color:'#185FA5',title:'10. Profesionales y Terapias Externas',rows:[
+      {l:'Profesionales',v:getTable('f-prof-tbody')},{l:'Terapias externas',v:getTable('f-terapias-tbody')},{l:'Recomendaciones',v:val('f-recomendaciones')}]},
+    {color:'#A32D2D',title:'11. Condiciones de Salud y Seguridad',rows:[
+      {l:'Condición médica',v:medica()},{l:'Condición neurológica',v:getChecked('f-neuro-list')},
+      {l:'Condición motora',v:getChecked('f-motora-list')},{l:'Seguridad / conducta',v:getChecked('f-seguridad-list')},
+      {l:'Otra información importante',v:val('f-salud-otros')}]},
+  ];
+  let html='';
+  sections.forEach(s=>{
+    html+=`<div class="summary-card"><div class="sum-hd" style="background:${s.color}">${s.title}</div><div class="sum-body">`;
+    s.rows.forEach(r=>{ const empty=!r.v||r.v.trim()===''; html+=`<div class="sum-row"><div class="sum-label">${r.l}</div><div class="sum-val${empty?' empty':''}">${empty?'No especificado':r.v.replace(/\n/g,'<br>')}</div></div>`; });
+    html+='</div></div>';
+  });
+  html+=`<div class="export-row"><button class="btn-export" onclick="exportJSON()">💾 Exportar resumen (JSON)</button><button class="btn-print-sum" onclick="window.print()">🖨 Imprimir / PDF</button><button class="btn-back btn" onclick="goTo(11)" style="margin-left:auto">← Volver a editar</button></div>`;
+  body.innerHTML=html;
+}
+function exportJSON(){
+  const data={
+    meta:{fecha:new Date().toLocaleDateString('es-DO'),centro:'Aprendo como en casa',tipo:'Entrevista Familiar'},
+    datos:{paciente:val('f-nombre'),nacimiento:val('f-nacimiento'),sexo:val('f-sexo'),ingreso:val('f-ingreso'),nivel_apoyo:val('f-nivel-apoyo'),informante:relacion()},
+    clinica:{dx_principal:val('f-dx-principal'),dx_secundario:val('f-dx-secundario'),dx_quien:val('f-dx-quien'),rasgos:val('f-rasgos')},
+    familia:{vive_con:getChecked('f-vive-list'),cuidador:val('f-cuidador'),otros_cuidadores:val('f-otros-cuidadores'),dinamica:getChecked('f-dinamica-list'),notas:val('f-dinamica-notas')},
+    desarrollo:{edad_cronologica:val('f-edad-cronologica'),edad_desarrollo:val('f-edad-desarrollo'),independencia:getChecked('f-independencia-list'),consideraciones:val('f-desarrollo-notas')},
+    sueno:{patron:getChecked('f-sueno-list'),horario:val('f-sueno-horario'),rutina:val('f-sueno-rutina'),apoyo:val('f-sueno-apoyo'),impacto:val('f-sueno-impacto')},
+    medicacion:{toma:(document.querySelector('input[name="f-med"]:checked')||{}).value||'',tabla:getTable('f-med-tbody')},
+    comunicacion:{comprende:getChecked('f-comprende-list'),expresa:getChecked('f-expresa-list'),apoyos:getChecked('f-apoyos-list'),notas:val('f-com-notas')},
+    sensorial:{hipersensibilidad:getChecked('f-hiper-list'),busqueda:getChecked('f-busca-list')},
+    regulacion:{senales:getChecked('f-senales-list'),detonantes:getChecked('f-triggers-list'),que_ayuda:getChecked('f-regula-list'),conductas:getChecked('f-conductas-list')},
+    motivadores:{intereses:val('f-intereses'),reforzadores:getChecked('f-reforzadores-list')},
+    profesionales:{lista:getTable('f-prof-tbody'),terapias:getTable('f-terapias-tbody'),recomendaciones:val('f-recomendaciones')},
+    salud:{medica:medica(),neurologica:getChecked('f-neuro-list'),motora:getChecked('f-motora-list'),seguridad:getChecked('f-seguridad-list'),otros:val('f-salud-otros')},
+  };
+  const nombre=val('f-nombre')||'paciente';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`entrevista_${nombre.replace(/\s+/g,'_')}.json`; a.click();
+}
+buildSteps(); updateProgress();
+</script>
+</body>
+</html>
